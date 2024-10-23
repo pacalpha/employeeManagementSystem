@@ -9,7 +9,7 @@ class Person
     std::string name; //attribute that is encapsulated in the person class
 
     public:
-    Person(std::string n) : name(n){} //constructor
+    Person(std::string n) : name(n){} //constructor that intializes the private name attribute
 
     std::string getName() const {return name;} //getter or accessor function
 };
@@ -21,8 +21,7 @@ class Employee : public Person
     int employeeId; //attribute that is encapsulated in the person class
 
     public:
-    //constructor that intializes the base class and derived attributes
-    Employee(std::string n,int id) : Person(n),employeeId(id) {}
+    Employee(std::string n,int id) : Person(n),employeeId(id) {} //constructor that intializes the base class and derived attributes
 
     int getEmployeeId() const {return employeeId;} //getter for employeeId
 }; 
@@ -37,9 +36,11 @@ class Manager : public Employee
 {
     private:
     std::vector<CastMember> castMembers; //vector to keep track of castmembers
+    int ManagerId;
     public:
-    Manager(std::string n,int id) : Employee(n,id){}
+    Manager(std::string n,int id,int mId) : Employee(n,id),ManagerId(mId){} //constructor that intializes the private attributes of the base class
 
+    int getManagerId() const {return ManagerId;} //getter for manager id
     //function to create instances of Castmember
     void createCastMembers(std::string name,int id)
     {
@@ -49,9 +50,16 @@ class Manager : public Employee
     }
 };
     
-     Manager manager("John Smith", 101); // Create a Manager instance   
 std::vector <Manager> managers;
-void addCastMember()
+
+//a function to emplace manager instances into the managers vector
+void intializeManagers()
+{
+    managers.emplace_back("John Smith", 101,1);    
+    managers.emplace_back("Jane Doe", 102,2); 
+}
+
+void addCastMember(Manager& manager) //pass manager by reference
 {
       std::string name;        
              int id;        
@@ -64,12 +72,13 @@ void addCastMember()
 }
 
 // Function for manager authentication
-            bool authenticateManager(int id) 
+            bool authenticateManager(int id,Manager& authenticatedManager) 
                 {    
                     for (const auto& manager : managers) 
                     {        
                         if (manager.getEmployeeId() == id) 
-                        {            
+                        {   
+                            authenticatedManager = manager;         
                             return true; // Manager is authenticated        
                         }    
                     }    
@@ -78,22 +87,21 @@ void addCastMember()
 
 int main()
 {
-    // Adding some managers for demonstration    
-                        managers.emplace_back("John Smith", 101);    
-                        // managers.emplace_back("Jane Doe", 102); 
-
+    
+    intializeManagers(); //function call to intialize managers
      int option;
      int managerId;
 
-       Manager authenticatedManager(manager.getName(), 0); // Variable to store the authenticated manager
+       Manager authenticatedManager("", 0,0); // Variable to store the authenticated manager
     authentication:
      std::cout << "Enter your Manager ID: ";    
     std::cin >> managerId;    
     // Authenticate manager    
-        if (!authenticateManager(managerId)) 
+        if (!authenticateManager(managerId,authenticatedManager)) 
             {        
-                std::cout << "Invalid Manager ID. Access Denied." << std::endl;       
-                return 1; // Exit if authentication fails    
+                std::cout << "Invalid Manager ID. Access Denied." << std::endl; 
+                goto authentication;      
+                return 0; // Exit if authentication fails    
             }
     menu:
     std::cout << "Welcome, " << authenticatedManager.getName() << "!" << std::endl;
@@ -105,7 +113,7 @@ int main()
      switch (option)    
      {    
         case 1: 
-            addCastMember();  
+            addCastMember(authenticatedManager);  
             goto  menu;    
              break;    
         case 2:
