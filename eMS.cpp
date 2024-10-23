@@ -6,31 +6,33 @@
 class Person 
 {
     private:
-    std::string name;
+    std::string name; //attribute that is encapsulated in the person class
 
     public:
     Person(std::string n) : name(n){} //constructor
 
-    std::string getName() const {return name;}
+    std::string getName() const {return name;} //getter or accessor function
 };
 
 //Derived class
 class Employee : public Person
 {
     private:
-    int employeeId;
+    int employeeId; //attribute that is encapsulated in the person class
 
     public:
     //constructor that intializes the base class and derived attributes
     Employee(std::string n,int id) : Person(n),employeeId(id) {}
-}; 
 
+    int getEmployeeId() const {return employeeId;} //getter for employeeId
+}; 
+//Derived class
 class CastMember : public Employee
 {
     public:
-    CastMember(std::string n,int id) :Employee(n,id){}
+    CastMember(std::string n,int id) :Employee(n,id){} //constructor that intializes the private attributes of the base class 
 };
-
+//Derived class
 class Manager : public Employee
 {
     private:
@@ -46,8 +48,9 @@ class Manager : public Employee
         std::cout<< "Cast Member: "<<name<<" created with ID: "<<id<<std::endl;
     }
 };
+    
      Manager manager("John Smith", 101); // Create a Manager instance   
-
+std::vector <Manager> managers;
 void addCastMember()
 {
       std::string name;        
@@ -60,19 +63,53 @@ void addCastMember()
              manager.createCastMembers(name, id);       
 }
 
+// Function for manager authentication
+            bool authenticateManager(int id) 
+                {    
+                    for (const auto& manager : managers) 
+                    {        
+                        if (manager.getEmployeeId() == id) 
+                        {            
+                            return true; // Manager is authenticated        
+                        }    
+                    }    
+                    return false; // Manager not found
+                }
+
 int main()
 {
-     int option;
+    // Adding some managers for demonstration    
+                        managers.emplace_back("John Smith", 101);    
+                        // managers.emplace_back("Jane Doe", 102); 
 
-     std::cout << "1: Add new cast member" << std::endl;    
+     int option;
+     int managerId;
+
+       Manager authenticatedManager(manager.getName(), 0); // Variable to store the authenticated manager
+    authentication:
+     std::cout << "Enter your Manager ID: ";    
+    std::cin >> managerId;    
+    // Authenticate manager    
+        if (!authenticateManager(managerId)) 
+            {        
+                std::cout << "Invalid Manager ID. Access Denied." << std::endl;       
+                return 1; // Exit if authentication fails    
+            }
+    menu:
+    std::cout << "Welcome, " << authenticatedManager.getName() << "!" << std::endl;
+     std::cout << "1: Add new cast member" << std::endl;  
+     std::cout << "2: Exit"<< std::endl;  
      std::cout << "Choose an option: ";    
      std::cin >> option;    
      
      switch (option)    
      {    
         case 1: 
-            addCastMember();       
+            addCastMember();  
+            goto  menu;    
              break;    
+        case 2:
+            goto authentication;
         
       
         default:        
@@ -81,4 +118,5 @@ int main()
 
     }
 }
+
 
