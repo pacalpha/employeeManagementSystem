@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <algorithm>
 
 class Person
 {
@@ -139,8 +140,21 @@ public:
 
         std::cout << getName() << " has successfully added " << castName << "with ID: " << castNum << "!\n";
     }
+    void deleteCastMember(std::vector<CastMember> &castmembers, int id)
+    {
+        auto it = std::remove_if(castmembers.begin(), castmembers.end(), [id](const CastMember &member)
+                                 { return member.getEmployeeId() == id; });
+        if (it != castmembers.end())
+        {
+            castmembers.erase(it, castmembers.end());
+            std::cout << getName() << " ID: " << id << " has been successfully deleted.\n";
+        }
+        else
+        {
+            std::cout << " No castmember found with ID:" << id << ".\n";
+        }
+    }
 };
-
 std::vector<Manager> managers =
     {
         Manager("jj", 100)};
@@ -231,7 +245,8 @@ employeeLogIn:
                     std::cout << "3. Clock History\n";
                     std::cout << "4. List all castmembers\n";
                     std::cout << "5. Create cast member\n";
-                    std::cout << "6. EXIT\n";
+                    std::cout << "6. Delete Castmember\n";
+                    std::cout << "7. EXIT\n";
                     std::cout << "Please select an option: ";
 
                     int managerMenu = validateInput();
@@ -259,6 +274,10 @@ employeeLogIn:
                         mg.createCastMember(castmembers);
                         break;
                     case 6:
+                        std::cout << "Enter ID for cast member to delete: ";
+                        mg.deleteCastMember(castmembers, validateInput());
+                        break;
+                    case 7:
                         system("clear");
                         goto employeeLogIn;
                         break;
