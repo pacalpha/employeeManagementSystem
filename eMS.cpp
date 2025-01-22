@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string>
+#include <ctime>
+#include <tuple>
 
 class Person
 {
@@ -16,6 +19,7 @@ class Employee : public Person
 private:
     int employeeId;
     bool clockIn;
+    std::vector<std::tuple<std::string, std::string, time_t>> clockHistory;
 
 public:
     Employee(std::string n, int id) : Person(n), employeeId(id), clockIn(false) {}
@@ -37,14 +41,59 @@ public:
     {
         clockIn = !clockIn;
 
+        std::time_t now = std::time(nullptr);
+        char buff[100];
+        std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+        std::string timeStamp(buff);
         if (clockIn)
         {
-            std::cout << getName() << " has clocked in\n";
+            std::cout << getName() << " has clocked in at " + timeStamp + "\n";
+            clockHistory.push_back(std::make_tuple(timeStamp, "Clock In", now));
         }
         else
         {
-            std::cout << getName() << " has clocked out\n";
+            std::cout << getName() << " has clocked out at " + timeStamp + "\n";
+            clockHistory.push_back(std::make_tuple(timeStamp, "Clock Out", now));
         }
+    }
+
+    void displayClockHistory() const
+    {
+        std::cout << "Clock History for " << getName() << ":\n";
+        for (const auto &entry : clockHistory)
+        {
+            const auto &timeStamp = std::get<0>(entry);
+            const auto &action = std::get<1>(entry);
+            const auto &timeValue = std::get<2>(entry);
+            std::cout << timeStamp << action << "(time: "
+                      << timeValue << ")\n";
+        }
+    }
+    void totalTimeWorked()
+    {
+        time_t totalTime = 0;
+        std::time_t lastClockInTime = 0;
+
+        for (const auto &entry : clockHistory)
+        {
+
+            const auto &action = std::get<1>(entry);
+            const auto &timeValue = std::get<2>(entry);
+            if (action == "Clock In")
+            {
+
+                lastClockInTime = timeValue;
+            }
+            else if (action == "Clock Out" && lastClockInTime != 0)
+            {
+                totalTime += difftime(timeValue, lastClockInTime);
+                lastClockInTime = 0;
+            }
+        }
+        int hours = static_cast<int>(totalTime / 3600);
+        int minutes = static_cast<int>((totalTime % 3600) / 60);
+        int seconds = static_cast<int>(totalTime);
+        std::cout << "Total time worked by " << getName() << ": " << hours << " hours " << minutes << " minutes" << seconds << "seconds\n";
     }
 };
 
@@ -119,7 +168,6 @@ int main()
 employeeLogIn:
     std::cout << "Enter employee ID:";
     int employeeNum = validateInput();
-    // std::cin >> employeeNum;
 
     while (true)
     {
@@ -134,7 +182,9 @@ employeeLogIn:
                 std::cout << "Welcome " << member.getName() << "!\n";
                 std::cout << "1. Check clock status\n";
                 std::cout << "2. Change clock status\n";
-                std::cout << "3.EXIT\n";
+                std::cout << "3. Total time worked\n";
+                std::cout << "clock history\n";
+                std::cout << "5.EXIT\n";
                 std::cout << "Please select an option: ";
 
                 int castMenu = validateInput();
@@ -148,8 +198,13 @@ employeeLogIn:
                 case 2:
                     member.changeClockStatus();
                     break;
-
                 case 3:
+                    member.totalTimeWorked();
+                    break;
+                case 4:
+                    member.displayClockHistory();
+                    break;
+                case 5:
                     goto employeeLogIn;
                     break;
                 default:
@@ -165,13 +220,13 @@ employeeLogIn:
                     std::cout << "welcome " << mg.getName() << "!\n";
                     std::cout << "1. Check clock status\n";
                     std::cout << "2. Change clock staus\n";
-                    std::cout << "3. List all castmembers\n";
-                    std::cout << "4. Create cast member\n";
-                    std::cout << "5. EXIT\n";
+                    std::cout << "3. Clock History\n";
+                    std::cout << "4. List all castmembers\n";
+                    std::cout << "5. Create cast member\n";
+                    std::cout << "6. EXIT\n";
                     std::cout << "Please select an option: ";
 
                     int managerMenu = validateInput();
-                    // std::cin >> managerMenu;
 
                     switch (managerMenu)
                     {
@@ -181,14 +236,16 @@ employeeLogIn:
                     case 2:
                         mg.changeClockStatus();
                         break;
-
                     case 3:
-                        mg.listAllCastMembers(castmembers);
+                        mg.displayClockHistory();
                         break;
                     case 4:
-                        mg.createCastMember(castmembers);
+                        mg.listAllCastMembers(castmembers);
                         break;
                     case 5:
+                        mg.createCastMember(castmembers);
+                        break;
+                    case 6:
                         goto employeeLogIn;
                         break;
                     default:
@@ -203,4 +260,3 @@ employeeLogIn:
             }
         }
     }
-}
