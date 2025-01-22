@@ -99,14 +99,7 @@ public:
     }
 };
 
-class CastMember : public Employee
-{
-private:
-public:
-    CastMember(std::string n, int id) : Employee(n, id) {}
-};
-
-std::vector<CastMember> castmembers;
+std::vector<Employee> castMembers;
 std::set<int> usedIds;
 int nextId = 1;
 
@@ -116,10 +109,10 @@ private:
 public:
     Manager(std::string n, int id) : Employee(n, id) {}
 
-    void listAllCastMembers(std::vector<CastMember> &castmembers)
+    void listAllCastMembers(std::vector<Employee> &castmembers)
     {
         std::cout << "List all Cast Members:\n";
-        for (CastMember &member : castmembers)
+        for (Employee &member : castmembers)
         {
             std::cout << "Name: " << member.getName()
                       << " ID: " << member.getEmployeeId()
@@ -132,7 +125,7 @@ public:
         }
     }
 
-    void createCastMember(std::vector<CastMember> &castmembers)
+    void createCastMember(std::vector<Employee> &castmembers)
     {
         std::cout << "Enter Cast Member name: ";
         std::string castName;
@@ -143,16 +136,16 @@ public:
             nextId++; // increment until a free Id is found
         }
 
-        castmembers.push_back(CastMember(castName, nextId));
+        castmembers.push_back(Employee(castName, nextId));
         usedIds.insert(nextId); // add new id to the set of IDs
 
         std::cout << getName() << " has successfully added " << castName << " with ID: " << nextId << "!\n";
 
         nextId++;
     }
-    void deleteCastMember(std::vector<CastMember> &castmembers, int id)
+    void deleteCastMember(std::vector<Employee> &castmembers, int id)
     {
-        auto it = std::remove_if(castmembers.begin(), castmembers.end(), [id](const CastMember &member)
+        auto it = std::remove_if(castmembers.begin(), castmembers.end(), [id](const Employee &member)
                                  { return member.getEmployeeId() == id; });
         if (it != castmembers.end())
         {
@@ -191,6 +184,7 @@ int validateInput()
 
 int main()
 {
+    std::vector<Employee> castMembers;
 employeeLogIn:
     std::cout << "Enter employee ID:";
     int employeeNum = validateInput();
@@ -200,7 +194,7 @@ employeeLogIn:
 
         bool found = false;
 
-        for (CastMember &member : castmembers)
+        for (Employee &member : castMembers)
         {
             if (employeeNum == member.getEmployeeId())
             {
@@ -278,16 +272,16 @@ employeeLogIn:
                     break;
                 case 4:
                     system("clear");
-                    mg.listAllCastMembers(castmembers);
+                    mg.listAllCastMembers(castMembers);
                     break;
                 case 5:
                     system("clear");
-                    mg.createCastMember(castmembers);
+                    mg.createCastMember(castMembers);
                     break;
                 case 6:
                     system("clear");
                     std::cout << "Enter ID for cast member to delete: ";
-                    mg.deleteCastMember(castmembers, validateInput());
+                    mg.deleteCastMember(castMembers, validateInput());
                     break;
                 case 7:
                     system("clear");
