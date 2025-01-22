@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <string>
 #include <ctime>
-#include <tuple>
 
 class Person
 {
@@ -19,7 +17,8 @@ class Employee : public Person
 private:
     int employeeId;
     bool clockIn;
-    std::vector<std::tuple<std::string, std::string, time_t>> clockHistory;
+    std::vector<std::pair<time_t, std::string>> clockInHistory;
+    std::vector<std::pair<time_t, std::string>> clockOutHistory;
 
 public:
     Employee(std::string n, int id) : Person(n), employeeId(id), clockIn(false) {}
@@ -41,59 +40,60 @@ public:
     {
         clockIn = !clockIn;
 
-        std::time_t now = std::time(nullptr);
+        time_t now = std::time(nullptr);
         char buff[100];
         std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
         std::string timeStamp(buff);
         if (clockIn)
         {
             std::cout << getName() << " has clocked in at " + timeStamp + "\n";
-            clockHistory.push_back(std::make_tuple(timeStamp, "Clock In", now));
+            clockInHistory.push_back(std::pair(now, timeStamp));
         }
         else
         {
             std::cout << getName() << " has clocked out at " + timeStamp + "\n";
-            clockHistory.push_back(std::make_tuple(timeStamp, "Clock Out", now));
+            clockOutHistory.push_back(std::pair{now, timeStamp});
         }
     }
 
     void displayClockHistory() const
     {
-        std::cout << "Clock History for " << getName() << ":\n";
-        for (const auto &entry : clockHistory)
+        std::cout << "Clock in History for " << getName() << ":\n";
+        for (const auto &entry : clockInHistory)
         {
             const auto &timeStamp = std::get<0>(entry);
-            const auto &action = std::get<1>(entry);
-            const auto &timeValue = std::get<2>(entry);
-            std::cout << timeStamp << action << "(time: "
-                      << timeValue << ")\n";
+            const auto &timeValue = std::get<1>(entry);
+            std::cout << timeStamp + "\n";
+        }
+        std::cout << "Clock out History:\n";
+        for (const auto &entry : clockOutHistory)
+        {
+            const auto &timeStamp = std::get<0>(entry);
+            const auto &timeValue = std::get<1>(entry);
+            std::cout << timeStamp + "\n";
+        }
+
+        if (clockInHistory.empty() || clockOutHistory.empty())
+        {
+            std::cout << "No clock history avaliable\n";
         }
     }
     void totalTimeWorked()
     {
-        time_t totalTime = 0;
-        std::time_t lastClockInTime = 0;
 
-        for (const auto &entry : clockHistory)
+        size_t timeDiff = std::min(clockInHistory.size(), clockOutHistory.size());
+        int i;
+        std::cout << " Total time worked by " << getName() << ":\n";
+        for (i = 0; i < timeDiff; i++)
         {
-
-            const auto &action = std::get<1>(entry);
-            const auto &timeValue = std::get<2>(entry);
-            if (action == "Clock In")
-            {
-
-                lastClockInTime = timeValue;
-            }
-            else if (action == "Clock Out" && lastClockInTime != 0)
-            {
-                totalTime += difftime(timeValue, lastClockInTime);
-                lastClockInTime = 0;
-            }
+            time_t timeIn = clockInHistory[i].first;
+            time_t timeOut = clockOutHistory[i].first;
+            time_t timeWorked = timeOut - timeIn;
+            int hours = (timeWorked / 3600);
+            int minutes = ((timeWorked % 3600) / 60);
+            int seconds = (timeWorked % 60);
+            std::cout << hours << " hours " << minutes << " minutes " << seconds << " seconds\n";
         }
-        int hours = static_cast<int>(totalTime / 3600);
-        int minutes = static_cast<int>((totalTime % 3600) / 60);
-        int seconds = static_cast<int>(totalTime);
-        std::cout << "Total time worked by " << getName() << ": " << hours << " hours " << minutes << " minutes" << seconds << "seconds\n";
     }
 };
 
@@ -122,7 +122,8 @@ public:
         {
             std::cout << "Name: " << member.getName()
                       << " ID: " << member.getEmployeeId()
-                      << std::endl;
+                      << "\t";
+            member.checkClockStatus();
         }
     }
 
@@ -183,7 +184,7 @@ employeeLogIn:
                 std::cout << "1. Check clock status\n";
                 std::cout << "2. Change clock status\n";
                 std::cout << "3. Total time worked\n";
-                std::cout << "clock history\n";
+                std::cout << "4. Clock history\n";
                 std::cout << "5.EXIT\n";
                 std::cout << "Please select an option: ";
 
@@ -260,3 +261,4 @@ employeeLogIn:
             }
         }
     }
+}
