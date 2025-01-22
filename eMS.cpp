@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <string>
 
 class Person
 {
@@ -96,28 +95,50 @@ std::vector<Manager> managers =
     {
         Manager("jj", 100)};
 
+int validateInput()
+{
+    int input;
+    std::cin >> input;
+    while (true)
+    {
+        if (std::cin.fail())
+        {
+            std::cin.clear();
+            std::cin.ignore();
+            std::cout << "Please enter valid input\n";
+        }
+        else
+        {
+            return input;
+        }
+    }
+}
+
 int main()
 {
 employeeLogIn:
     std::cout << "Enter employee ID:";
-    int employeeNum;
-    std::cin >> employeeNum;
+    int employeeNum = validateInput();
+    // std::cin >> employeeNum;
 
     while (true)
     {
+
+        bool found = false;
 
         for (CastMember &member : castmembers)
         {
             if (employeeNum == member.getEmployeeId())
             {
+                found = true;
                 std::cout << "Welcome " << member.getName() << "!\n";
                 std::cout << "1. Check clock status\n";
                 std::cout << "2. Change clock status\n";
                 std::cout << "3.EXIT\n";
-                std::cout << "Please select an option\n";
+                std::cout << "Please select an option: ";
 
-                int castMenu;
-                std::cin >> castMenu;
+                int castMenu = validateInput();
+                // std::cin >> castMenu;
 
                 switch (castMenu)
                 {
@@ -127,12 +148,12 @@ employeeLogIn:
                 case 2:
                     member.changeClockStatus();
                     break;
+
                 case 3:
-                    break;
-                case 4:
                     goto employeeLogIn;
                     break;
                 default:
+                    std::cout << "Invalid input\n";
                     break;
                 }
             }
@@ -140,16 +161,17 @@ employeeLogIn:
             {
                 if (employeeNum == mg.getEmployeeId())
                 {
-                    std::cout << "Welcome " << mg.getName() << "!\n";
+                    found = true;
+                    std::cout << "welcome " << mg.getName() << "!\n";
                     std::cout << "1. Check clock status\n";
                     std::cout << "2. Change clock staus\n";
                     std::cout << "3. List all castmembers\n";
                     std::cout << "4. Create cast member\n";
                     std::cout << "5. EXIT\n";
-                    std::cout << "Please select an option\n";
+                    std::cout << "Please select an option: ";
 
-                    int managerMenu;
-                    std::cin >> managerMenu;
+                    int managerMenu = validateInput();
+                    // std::cin >> managerMenu;
 
                     switch (managerMenu)
                     {
@@ -169,8 +191,15 @@ employeeLogIn:
                     case 5:
                         goto employeeLogIn;
                         break;
+                    default:
+                        std::cout << "Invalid input\n";
                     }
                 }
+            }
+            if (!found)
+            {
+                std::cout << "Invalid input.Please try again\n";
+                goto employeeLogIn;
             }
         }
     }
