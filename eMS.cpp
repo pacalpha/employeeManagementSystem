@@ -194,21 +194,28 @@ employeeLogIn:
                 switch (castMenu)
                 {
                 case 1:
+                    system("clear");
                     member.checkClockStatus();
                     break;
                 case 2:
+                    system("clear");
                     member.changeClockStatus();
                     break;
+
                 case 3:
+                    system("clear");
                     member.totalTimeWorked();
                     break;
                 case 4:
+                    system("clear");
                     member.displayClockHistory();
                     break;
                 case 5:
+                    system("clear");
                     goto employeeLogIn;
                     break;
                 default:
+                    system("clear");
                     std::cout << "Invalid input\n";
                     break;
                 }
@@ -232,21 +239,27 @@ employeeLogIn:
                     switch (managerMenu)
                     {
                     case 1:
+                        system("clear");
                         mg.checkClockStatus();
                         break;
                     case 2:
+                        system("clear");
                         mg.changeClockStatus();
                         break;
                     case 3:
+                        system("clear");
                         mg.displayClockHistory();
                         break;
                     case 4:
+                        system("clear");
                         mg.listAllCastMembers(castmembers);
                         break;
                     case 5:
+                        system("clear");
                         mg.createCastMember(castmembers);
                         break;
                     case 6:
+                        system("clear");
                         goto employeeLogIn;
                         break;
                     default:
